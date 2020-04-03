@@ -1,0 +1,51 @@
+---
+version: '2'
+
+services:
+  speedtest:
+    image: spedy:latest
+    build: .
+    environment:
+      - INFLUX_HOST=influxdb
+      - INFLUX_DB=speedtest
+      - INFLUX_USER=admin
+      - INFLUX_PASSWORD=admin
+      - INFLUX_PORT=8086
+    network_mode: bridge
+    links:
+      - influxdb
+
+  influxdb:
+    image: influxdb:latest
+    network_mode: bridge
+    ports:
+      - '8086:8086'
+      - '8083:8083'
+    volumes:
+      - influxdb-storage:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=jobmonitor
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+
+  chronograf:
+    image: chronograf:latest
+    network_mode: bridge
+    ports:
+      - '8888:8888'
+    volumes:
+      - chronograf-storage:/var/lib/chronograf
+    depends_on:
+      - influxdb
+    environment:
+      - VIRTUAL_HOST=monitor.whoami.local
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_USERNAME=admin
+      - INFLUXDB_PASSWORD=admin
+    links:
+      - influxdb
+volumes:
+  influxdb-storage:
+  chronograf-storage:
+  grafana-storage:
+
