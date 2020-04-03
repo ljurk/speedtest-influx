@@ -9,8 +9,6 @@ COPY requirements.txt .
 #    && apk del git g++ gcc
 
 #copy all files to workdir
-COPY docker-entrypoint.sh .
-RUN chmod +x docker-entrypoint.sh
 COPY test.py .
 
 # define default environment variables
