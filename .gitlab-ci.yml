@@ -1,0 +1,19 @@
+---
+stages:
+    - build
+
+docker:
+    image: docker:stable
+    stage: build
+    variables:
+        DOCKER_DRIVER: overlay2
+        DOCKER_HOST: "tcp://docker:2375"
+        # See https://github.com/docker-library/docker/pull/166
+        DOCKER_TLS_CERTDIR: ""
+    services:
+        - docker:dind
+    script:
+        - docker info
+        - docker login -u $CI_USER -p $CI_TOKEN $REGISTRY_SERVER
+        - docker build . -t $REGISTRY_SERVER/ljurk/speedtest
+        - docker push $REGISTRY_SERVER/ljurk/speedtest
